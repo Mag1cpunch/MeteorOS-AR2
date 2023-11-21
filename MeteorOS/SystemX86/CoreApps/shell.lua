@@ -43,19 +43,19 @@ local function openProgram(app, category)
     if app ~= nil then
         if category == nil and fs.exists("/MeteorOS/Programs/"..app) then
             shell.run("/MeteorOS/Programs/"..app)
-        elseif category ~= nil and fs.exists("/MeteorOS/Programs/"..app) then
-            if fs.exists("/MeteorOS/Programs/"..category) and fs.exists("/MeteorOS/Programs/"..category.."/"..app) then
-                shell.run("/MeteorOS/Programs/"..category.."/"..app)
-            elseif not fs.exists("/MeteorOS/Programs/"..category) then
-                print("Category '"..category.."' doesn't exist")
-            elseif fs.exists("/MeteorOS/Programs/"..category) and not fs.exists("/MeteorOS/Programs/"..category.."/"..app) then
+        elseif category ~= nil and fs.exists("/MeteorOS/Programs/"..category) then
+            local fullPath = "/MeteorOS/Programs/"..category.."/"..app
+            if fs.exists(fullPath) then
+                shell.run(fullPath)
+            else
                 print("App '"..app.."' doesn't exist in category '"..category.."'")
             end
         else
             print("Program '"..app.."' doesn't exist")
         end
+    else
+        print("[System Exception] openProgram(): No program specified.")
     end
-    shell.run("/MeteorOS/Programs/"..app)
 end
 local function installUpdate()
     if fs.exists("/MeteorOS") then
