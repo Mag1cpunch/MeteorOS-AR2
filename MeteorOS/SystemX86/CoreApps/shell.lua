@@ -284,7 +284,35 @@ local function initfs()
     end
 end
 local function cd(path)
-    shell.setDir(path)
+    if fs.exists(path) then
+        shell.setDir(path)
+    else
+        print("Directory doesn't exist")
+    end
+end
+local function ls(path)
+    local t = {}
+    if path == nil or path == "" then
+        local indexes = fs.list(shell.dir())
+        print()
+        for _, index in ipairs(indexes) do
+            print(index.name)
+        end
+        print()
+    elseif path ~= nil then
+        if fs.exists(path) then
+            local indexes = fs.list(path)
+            print()
+            for _, index in ipairs(indexes) do
+                print(index.name)
+            end
+            print()
+        else
+            print("Directory '"..path.."' doesn't exist")
+        end
+    else
+        print("No path specified")
+    end
 end
 -------------------------------
 local function verifyAPIS()
@@ -299,6 +327,7 @@ local function verifyAPIS()
     end
     print("Verified!")
 end
+initfs()
 verifyAPIS()
 term.clear()
 print("[[-------------------------------]]")
@@ -342,6 +371,10 @@ local function cli()
         print("[[Interactive Shell 1.0]]")
         print("[[---------------------]]")
         print()
+    elseif words[1] == "cd" then
+        cd(words[2])
+    elseif words[1] == "ls" then
+        ls(words[2])
     elseif words[1] == "update" then
         installUpdate()
     elseif words[1] == "appstore" then
