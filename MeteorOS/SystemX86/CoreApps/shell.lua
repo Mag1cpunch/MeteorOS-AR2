@@ -137,6 +137,69 @@ local function saveFile(filename, content)
         print("Error saving file")
     end
 end
+local function editContent(content)
+    local lines = textutils.unserializeJSON('["' .. content:gsub("\n", '","') .. '"]')
+    local yPos = 1
+    local scroll = 1
+    local cursorX, cursorY = 1, 1
+
+    while true do
+        term.clear()
+        term.setCursorPos(1, 1)
+
+        -- Display lines
+        for i = scroll, scroll + 9 do
+            if lines[i] then
+                term.setCursorPos(1, i - scroll + 1)
+                term.write(lines[i])
+            end
+        end
+
+        -- Display cursor
+        term.setCursorPos(cursorX, cursorY - scroll + 1)
+
+        local event, param = os.pullEvent()
+        if event == "key" then
+            if param == keys.up and cursorY > 1 then
+                cursorY = cursorY - 1
+                if cursorY < scroll then
+                    scroll = scroll - 1
+                end
+            elseif param == keys.down and cursorY < #lines then
+                cursorY = cursorY + 1
+                if cursorY > scroll + 9 then
+                    scroll = scroll + 1
+                end
+            elseif param == keys.left and cursorX > 1 then
+                cursorX = cursorX - 1
+            elseif param == keys.right and cursorX < #lines[cursorY] + 1 then
+                cursorX = cursorX + 1
+            elseif param == keys.enter then
+                table.insert(lines, cursorY + 1, lines[cursorY]:sub(cursorX))
+                lines[cursorY] = lines[cursorY]:sub(1, cursorX - 1)
+                cursorY = cursorY + 1
+                cursorX = 1
+            elseif param == keys.backspace then
+                if cursorX > 1 then
+                    lines[cursorY] = lines[cursorY]:sub(1, cursorX - 2) .. lines[cursorY]:sub(cursorX)
+                    cursorX = cursorX - 1
+                elseif cursorY > 1 then
+                    cursorY = cursorY - 1
+                    cursorX = #lines[cursorY] + 1
+                    lines[cursorY] = lines[cursorY] .. lines[cursorY + 1]
+                    table.remove(lines, cursorY + 1)
+                end
+            end
+        elseif event == "char" then
+            lines[cursorY] = lines[cursorY]:sub(1, cursorX - 1) .. param .. lines[cursorY]:sub(cursorX)
+            cursorX = cursorX + 1
+        elseif event == "key_up" and param == keys.leftCtrl then
+            break
+        end
+    end
+
+    return table.concat(lines, "\n")
+end
 local function textEditor()
     term.clear()
     term.setCursorPos(1, 1)
@@ -163,16 +226,14 @@ local function textEditor()
             term.setCursorPos(1, 1)
 
             print("File: " .. filename)
-            print("Press Ctrl + T to exit editing mode.")
+            print("Press Ctrl to exit editing mode.")
 
             term.setCursorBlink(true)
 
             -- Read and edit the content
-            local _, editedContent = edit(content)
+            content = editContent(content)
 
             term.setCursorBlink(false)
-
-            content = editedContent
         elseif option == 2 then
             saveFile(filename, content)
         elseif option == 3 then
