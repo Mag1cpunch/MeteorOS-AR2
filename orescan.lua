@@ -99,7 +99,7 @@ local function render()
 end
 local function mainCanvas()
     local text = canvas.addText({ x = 30, y = 30 }, "")
-    text.setScale(3)
+    text.setScale(1)
     while true do
         text.setText("MeteorOS AR-Plethora, Version 2.0")
         sleep(1)
