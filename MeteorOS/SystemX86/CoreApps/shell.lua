@@ -87,7 +87,7 @@ local function cli()
     elseif words[1] == "reboot" then
         os.reboot()
     elseif words[1] == "run" then
-        xpcall(openProgram, handleError, words[2])
+        openProgram(words[2])
     elseif words[1] == "help" then
         if words[2] == nil then
             print("[[---------------------------]]")
