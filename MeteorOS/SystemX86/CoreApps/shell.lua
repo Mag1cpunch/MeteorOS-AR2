@@ -29,6 +29,38 @@ local function parse(var, datatype)
         printError("[System Exception] parse(): Variable is not defined or invalid datatype")
     end
 end
+local function readLines(filename)
+    local file = io.open(filename, "r")
+    if file then
+        local lines = {}
+        for line in file:lines() do
+            table.insert(lines, line)
+        end
+        file:close()
+        return lines
+    else
+        print("Error opening file: " .. filename)
+        return nil
+    end
+end
+local function listGitFiles(repoUrl)
+    local apiUrl = repoUrl .. "/contents/"
+    local response = http.get(apiUrl)
+
+    if response then
+        local responseData = response.readAll()
+        response.close()
+
+        local files = textutils.unserializeJSON(responseData)
+        for _, file in ipairs(files) do
+            if file.type == "file" and file.name ~= "README.md" then
+                print("File: " .. file.name)
+            end
+        end
+    else
+        print("Failed to fetch data from GitHub.")
+    end
+end
 local function handleError(err)
     printError("System Exception:", err)
 end
@@ -74,6 +106,25 @@ local function installUpdate()
     os.reboot()
 end
 -------------------------------
+local function verifyAPIS()
+    local content = http.get("https://pastebin.com/raw/HG7CQhxH").readAll()
+    local ardata = fs.open("/MeteorOS/SystemX86/APIS/ar_terminal.lua", "r")
+    print("Verifying APIS...")
+    if not fs.exists("/MeteorOS/SystemX86/APIS/ar_terminal.lua") then
+        local content = http.get("https://pastebin.com/raw/HG7CQhxH").readAll()
+        local arterminal = fs.open("/MeteorOS/SystemX86/APIS/ar_terminal.lua", "w")
+        arterminal.write(content)
+        arterminal.close()
+    elseif fs.exists("/MeteorOS/SystemX86/APIS/ar_terminal.lua") and ardata.readAll() ~= content.readAll() then
+        local arterminal = fs.open("/MeteorOS/SystemX86/APIS/ar_terminal.lua", "w+")
+        arterminal.write(content)
+        arterminal.close()
+    else
+        print("APIs is already and installed and up to date")
+    end
+    print("Verified!")
+end
+verifyAPIS()
 term.clear()
 print("[[---------------------]]")
 print("[[Interactive Shell 1.0]]")
