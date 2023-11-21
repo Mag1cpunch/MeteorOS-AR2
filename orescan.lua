@@ -97,4 +97,12 @@ local function render()
 		sleep(renderInterval)
 	end
 end
-parallel.waitForAll(render, scan)
+local function mainCanvas()
+    local text = canvas.addText({ x = 30, y = 30 }, "")
+    text.setScale(3)
+    while true do
+        text.setText("MeteorOS AR-Plethora, Version 2.0")
+        sleep(1)
+    end
+end
+parallel.waitForAll(render, scan, mainCanvas)
