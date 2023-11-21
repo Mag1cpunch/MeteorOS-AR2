@@ -152,7 +152,10 @@ local function cli()
             print("[[---------------------------]]")
         elseif words[2] == "programs" then
             print("[[----------Programs---------]]")
-            print("orescanner")
+            local programs = fs.list("/MeteorOS/Programs")
+            for i in ipairs(programs) do
+                print(i)
+            end
             print("[[---------------------------]]")
         else print("Invalid argument")
         end
