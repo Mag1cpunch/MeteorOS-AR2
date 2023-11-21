@@ -105,6 +105,63 @@ local function installUpdate()
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua")
     os.reboot()
 end
+local function listGitFiles(repoUrl)
+    local apiUrl = repoUrl .. "/contents/"
+    local response = http.get(apiUrl)
+
+    if response then
+        local responseData = response.readAll()
+        response.close()
+
+        local files = textutils.unserializeJSON(responseData)
+        for _, file in ipairs(files) do
+            if file.type == "file" and file.name ~= "README.md" then
+                print("File: " .. file.name)
+            end
+        end
+    else
+        print("Failed to fetch data from GitHub.")
+    end
+end
+local function table_contains(tbl, x)
+    found = false
+    for _, v in pairs(tbl) do
+        if v == x then 
+            found = true 
+        end
+    end
+    return found
+end
+-------------------------------
+--Integrated-apps--------------
+local function appstore()
+    local files = listGitFiles("https://github.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
+    print("Programs:")
+    for _, file in ipairs(files) do
+        print(file)
+    end
+    print("---End---")
+    local i = input("Enter program to download(say 'exit' to exit program): ")
+    if i == "exit" then
+        return
+    end
+    if table_contains(files, i) then
+        print("Installing "..i.."...")
+        shell.run("cd /MeteorOS/Programs/")
+        shell.run("wget https://github.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/"..i)
+        shell.run("cd /")
+        print("Installed!")
+    elseif table_contains(files, i) and fs.exists("/MeteorOS/Programs"..i) then
+        print("Program '"..i.."' already installed, Updating...")
+        fs.delete("/MeteorOS/Programs"..i)
+        shell.run("cd /MeteorOS/Programs/")
+        shell.run("wget https://github.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/"..i)
+        shell.run("cd /")
+        print("Updated!")
+    else
+        print("Program '"..i.."' doesn't exists in repository")
+    end
+end
 -------------------------------
 local function verifyAPIS()
     local content = http.get("https://pastebin.com/raw/HG7CQhxH").readAll()
