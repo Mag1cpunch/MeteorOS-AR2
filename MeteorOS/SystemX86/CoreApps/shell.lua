@@ -85,6 +85,7 @@ local function installUpdate()
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/CoreApps/shell.lua")
     shell.run("cd ../../Programs")
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/arterm.lua")
     os.reboot()
 end
 local function listGitFiles(repoUrl)
