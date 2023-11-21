@@ -34,8 +34,8 @@ local function handleError(err)
 end
 local function splitBySpaces(str)
     local t = {}
-    for k, v in string.gmatch(str, "(%w+)=(%w+)") do
-      t[k] = v
+    for word in str:gmatch("%S+") do
+        table.insert(t, word)
     end
     return t
 end
@@ -52,7 +52,7 @@ local function openProgram(app, category)
                 print("App '"..app.."' doesn't exist in category '"..category.."'")
             end
         else
-            print("Program '"..app"' doesn't exist")
+            print("Program '"..app.."' doesn't exist")
         end
     end
     shell.run("/MeteorOS/Programs/"..app)
@@ -64,12 +64,12 @@ local function installUpdate()
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/startup.lua")
     shell.run("mkdir /MeteorOS")
     shell.run("cd /MeteorOS")
-    shell.run("mkdir /MeteorOS/SystemX86")
-    shell.run("mkdir /MeteorOS/SystemX86/CoreApps")
-    shell.run("mkdir /MeteorOS/Programs")
-    shell.run("cd /MeteorOS/SystemX86/CoreApps")
+    shell.run("mkdir SystemX86")
+    shell.run("mkdir SystemX86/CoreApps")
+    shell.run("mkdir Programs")
+    shell.run("cd SystemX86/CoreApps")
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/CoreApps/shell.lua")
-    shell.run("cd /MeteorOS/Programs")
+    shell.run("cd ../../Programs")
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua")
     os.reboot()
 end
@@ -88,7 +88,7 @@ local function cli()
         os.reboot()
     elseif words[1] == "run" then
         xpcall(openProgram, handleError, words[2])
-    elseif words[0] == "help" then
+    elseif words[1] == "help" then
         if words[2] == nil then
             print("[[---------------------------]]")
             print("shutdown - Shutdown the computer")
