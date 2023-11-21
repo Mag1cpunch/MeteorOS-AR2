@@ -75,9 +75,9 @@ local function installUpdate()
 end
 -------------------------------
 term.clear()
-print("[[-----------------------------------------]]")
-print("[[MeteorOS-AR, OS Version: 2.0, Mode: Shell]]")
-print("[[-----------------------------------------]]")
+print("[[---------------------]]")
+print("[[Interactive Shell 1.0]]")
+print("[[---------------------]]")
 print()
 local function cli()
     local i = input("MeteorOS>> ")
