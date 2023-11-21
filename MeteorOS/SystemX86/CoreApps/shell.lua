@@ -57,7 +57,24 @@ local function openProgram(app, category)
     end
     shell.run("/MeteorOS/Programs/"..app)
 end
+local function installUpdate()
+    if fs.exists("/MeteorOS") then
+        fs.delete("/MeteorOS")
+    end
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/startup.lua")
+    shell.run("mkdir /MeteorOS")
+    shell.run("cd /MeteorOS")
+    shell.run("mkdir /MeteorOS/SystemX86")
+    shell.run("mkdir /MeteorOS/SystemX86/CoreApps")
+    shell.run("mkdir /MeteorOS/Programs")
+    shell.run("cd /MeteorOS/SystemX86/CoreApps")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/CoreApps/shell.lua")
+    shell.run("cd /MeteorOS/Programs")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua")
+    os.reboot()
+end
 -------------------------------
+term.clear()
 print("[[-----------------------------------------]]")
 print("[[MeteorOS-AR, OS Version: 2.0, Mode: Shell]]")
 print("[[-----------------------------------------]]")
@@ -80,6 +97,7 @@ local function cli()
             print("run - Launch the specified program")
             print("desktop - Launches experimental ui environment(Needs overlay glasses and neural interface)")
             print("clear - Clear the terminal text")
+            print("update - Update the OS")
             print("[[---------------------------]]")
         elseif words[2] == "programs" then
             print("[[----------Programs---------]]")
@@ -93,6 +111,8 @@ local function cli()
         print("[[MeteorOS-AR, OS Version: 2.0, Mode: Shell]]")
         print("[[-----------------------------------------]]")
         print()
+    elseif words[1] == "update" then
+        installUpdate()
     else
         print("Invalid command: "..i)
     end
