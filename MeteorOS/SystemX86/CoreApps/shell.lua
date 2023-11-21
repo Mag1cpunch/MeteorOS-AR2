@@ -217,20 +217,12 @@ local function appstore()
 end
 -------------------------------
 local function verifyAPIS()
-    local content = http.get("https://pastebin.com/raw/HG7CQhxH").readAll()
-    local ardata = fs.open("/MeteorOS/SystemX86/APIS/ar_terminal.lua", "r")
     print("Verifying APIS...")
     if not fs.exists("/MeteorOS/SystemX86/APIS/ar_terminal.lua") then
-        local content = http.get("https://pastebin.com/raw/HG7CQhxH").readAll()
-        local arterminal = fs.open("/MeteorOS/SystemX86/APIS/ar_terminal.lua", "w")
-        arterminal.write(content)
-        arterminal.close()
-    elseif fs.exists("/MeteorOS/SystemX86/APIS/ar_terminal.lua") and ardata.readAll() ~= content.readAll() then
-        local arterminal = fs.open("/MeteorOS/SystemX86/APIS/ar_terminal.lua", "w+")
-        arterminal.write(content)
-        arterminal.close()
+        shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/APIS/ar_terminal.lua")
     else
-        print("APIs is already and installed and up to date")
+        fs.delete("/MeteorOS/SystemX86/APIS/ar_terminal.lua")
+        shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/APIS/ar_terminal.lua")
     end
     print("Verified!")
 end
