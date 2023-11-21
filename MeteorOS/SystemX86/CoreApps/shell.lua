@@ -276,6 +276,16 @@ local function appstore()
         print("Program '"..i.."' doesn't exists in repository")
     end
 end
+local function initfs()
+    if not fs.exists("/MeteorOS/Storage") then
+        fs.makeDir("/MeteorOS/Storage")
+        fs.makeDir("/MeteorOS/Storage/Downloads")
+        fs.makeDir("/MeteorOS/Storage/Documents")
+    end
+end
+local function cd(path)
+    shell.setDir(path)
+end
 -------------------------------
 local function verifyAPIS()
     print("Verifying APIS...")
@@ -291,12 +301,14 @@ local function verifyAPIS()
 end
 verifyAPIS()
 term.clear()
-print("[[---------------------]]")
-print("[[Interactive Shell 1.0]]")
-print("[[---------------------]]")
+print("[[-------------------------------]]")
+print("[[MeteorOS, Interactive Shell 1.0]]")
+print("[[-------------------------------]]")
 print()
+shell.setDir("/MeteorOS")
 local function cli()
-    local i = input("MeteorOS>> ")
+    cdir = shell.dir()
+    local i = input(cdir..">> ")
     local words = splitBySpaces(i)
     if words[1] == "shutdown" then
         os.shutdown()
