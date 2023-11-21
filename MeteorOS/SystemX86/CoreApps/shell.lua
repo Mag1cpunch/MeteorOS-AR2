@@ -88,7 +88,7 @@ local function cli()
         os.reboot()
     elseif words[1] == "run" then
         xpcall(openProgram, handleError, words[2])
-    elseif words[1] == "help" then
+    elseif words[0] == "help" then
         if words[2] == nil then
             print("[[---------------------------]]")
             print("shutdown - Shutdown the computer")
