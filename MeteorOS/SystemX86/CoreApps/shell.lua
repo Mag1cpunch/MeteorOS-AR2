@@ -317,7 +317,7 @@ local function cli()
             print("[[----------Programs---------]]")
             local programs = fs.list("/MeteorOS/Programs")
             for i in ipairs(programs) do
-                print(i)
+                print(i.name)
             end
             print("[[---------------------------]]")
         else print("Invalid argument")
