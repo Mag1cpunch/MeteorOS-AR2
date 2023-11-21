@@ -102,6 +102,7 @@ local function listGitFiles(repoUrl)
                 table.insert(t, file.name)
             end
         end
+        return t
     else
         print("Failed to fetch data from GitHub.")
     end
