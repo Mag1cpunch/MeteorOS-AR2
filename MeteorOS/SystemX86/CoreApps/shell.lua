@@ -96,9 +96,10 @@ local function listGitFiles(repoUrl)
         response.close()
 
         local files = textutils.unserializeJSON(responseData)
+        local t = {}
         for _, file in ipairs(files) do
             if file.type == "file" and file.name ~= "README.md" then
-                print("File: " .. file.name)
+                table.insert(t, file.name)
             end
         end
     else
@@ -106,7 +107,7 @@ local function listGitFiles(repoUrl)
     end
 end
 local function table_contains(tbl, x)
-    found = false
+    local found = false
     for _, v in pairs(tbl) do
         if v == x then 
             found = true 
@@ -117,6 +118,7 @@ end
 -------------------------------
 --Integrated-apps--------------
 local function appstore()
+    local files
     local files = listGitFiles("https://github.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
     print("Programs:")
     for _, file in ipairs(files) do
