@@ -1,4 +1,4 @@
-local arterm = os.require("/MeteorOS/SystemX86/APIS/ar_terminal.lua")
+local arterm = require("/MeteorOS/SystemX86/APIS/ar_terminal.lua")
 local modules = peripheral.find("neuralInterface")
 local function terminal()
     local termsize = term.getSize()
