@@ -117,6 +117,73 @@ local function table_contains(tbl, x)
     end
     return found
 end
+local function loadFile(filename)
+    local file = fs.open(filename, "r")
+    if file then
+        local content = file.readAll()
+        file.close()
+        return content
+    else
+        return nil
+    end
+end
+local function saveFile(filename, content)
+    local file = fs.open(filename, "w")
+    if file then
+        file.write(content)
+        file.close()
+        print("File saved as " .. filename)
+    else
+        print("Error saving file")
+    end
+end
+local function textEditor()
+    term.clear()
+    term.setCursorPos(1, 1)
+
+    print("Simple Text Editor")
+    print("------------------")
+
+    local filename = input("Enter filename to edit: ")
+    local content = loadFile(filename) or ""
+
+    while true do
+        term.clear()
+        term.setCursorPos(1, 1)
+
+        print("File: " .. filename)
+        print("Options:")
+        print("1. Edit")
+        print("2. Save")
+        print("3. Exit")
+
+        local option = tonumber(input("Select option (1-3): "))
+        if option == 1 then
+            term.clear()
+            term.setCursorPos(1, 1)
+
+            print("File: " .. filename)
+            print("Press Ctrl + T to exit editing mode.")
+
+            term.setCursorBlink(true)
+
+            -- Read and edit the content
+            local _, editedContent = edit(content)
+
+            term.setCursorBlink(false)
+
+            content = editedContent
+        elseif option == 2 then
+            saveFile(filename, content)
+        elseif option == 3 then
+            break
+        end
+    end
+
+    term.clear()
+    term.setCursorPos(1, 1)
+    print("Text editor closed.")
+end
 -------------------------------
 --Integrated-apps--------------
 local function appstore()
@@ -212,6 +279,8 @@ local function cli()
         installUpdate()
     elseif words[1] == "appstore" then
         appstore()
+    elseif words[1] == "nova" then
+        textEditor()
     else
         print("Invalid command: "..i)
     end
