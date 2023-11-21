@@ -43,24 +43,6 @@ local function readLines(filename)
         return nil
     end
 end
-local function listGitFiles(repoUrl)
-    local apiUrl = repoUrl .. "/contents/"
-    local response = http.get(apiUrl)
-
-    if response then
-        local responseData = response.readAll()
-        response.close()
-
-        local files = textutils.unserializeJSON(responseData)
-        for _, file in ipairs(files) do
-            if file.type == "file" and file.name ~= "README.md" then
-                print("File: " .. file.name)
-            end
-        end
-    else
-        print("Failed to fetch data from GitHub.")
-    end
-end
 local function handleError(err)
     printError("System Exception:", err)
 end
@@ -224,6 +206,8 @@ local function cli()
         print()
     elseif words[1] == "update" then
         installUpdate()
+    elseif words[1] == "appstore" then
+        appstore()
     else
         print("Invalid command: "..i)
     end
