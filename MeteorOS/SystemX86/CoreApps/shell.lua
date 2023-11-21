@@ -107,9 +107,9 @@ local function cli()
         end
     elseif words[1] == "clear" then
         term.clear()
-        print("[[-----------------------------------------]]")
-        print("[[MeteorOS-AR, OS Version: 2.0, Mode: Shell]]")
-        print("[[-----------------------------------------]]")
+        print("[[---------------------]]")
+        print("[[Interactive Shell 1.0]]")
+        print("[[---------------------]]")
         print()
     elseif words[1] == "update" then
         installUpdate()
