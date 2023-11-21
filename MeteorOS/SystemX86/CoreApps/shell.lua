@@ -64,7 +64,7 @@ print("[[-----------------------------------------]]")
 print()
 local function cli()
     local i = input("MeteorOS>> ")
-    local words = xpcall(splitBySpaces, handleError, i)
+    local words = splitBySpaces(i)
     if words[1] == "shutdown" then
         os.shutdown()
     elseif words[1] == "reboot" then
