@@ -122,7 +122,7 @@ local function installPackage(pkg)
         return
     end
 
-    local pkgs = listGitFiles("Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
+    local pkgs = listGitFiles("Mag1cpunch", "MeteorOS-AR2", "MeteorOS/Programs")
     if not pkgs then
         print("mpm: Failed to retrieve package list.")
         return
