@@ -142,8 +142,8 @@ local function installPackage(pkg)
     end
 end
 local function removePackage(pkg)
-    if fs.exists("MeteorOS/Programs"..pkg..".lua") then
-        fs.delete("MeteorOS/Programs"..pkg..".lua")
+    if fs.exists("MeteorOS/Programs/"..pkg..".lua") then
+        fs.delete("MeteorOS/Programs/"..pkg..".lua")
         print("Package '"..pkg.."' removed.")
     elseif pkg == nil or pkg == "" then
         print("mpm: No package specified")
