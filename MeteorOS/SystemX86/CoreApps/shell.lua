@@ -78,8 +78,8 @@ local function installUpdate()
     shell.run("wget https://energetic.pw/computercraft/ore3d/assets/ore3d.lua /MeteorOS/Programs/ore3d.lua")
     os.reboot()
 end
-local function listGitFiles(repoUrl)
-    local apiUrl = "https://api.github.com/repos/" .. repoUrl .. "/contents/"
+local function listGitFiles(username, repo, path)
+    local apiUrl = "https://api.github.com/repos/"..username.."/".. repo.."/contents/"..path
     local response = http.get(apiUrl)
 
     if response then
@@ -98,18 +98,7 @@ local function listGitFiles(repoUrl)
         print("Failed to fetch data from GitHub.")
     end
 end
-local function installPackage(pkg)
-    local pkgs = listGitFiles("Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
-    if not table.contains(pkgs, pkg) then
-        print("mpm: Package '"..pkg.."' doesn't exist.")
-    elseif pkg == nil or pkg == "" then
-        print("mpm: No package specified")
-    else
-        print("Downloading package '"..pkg.."'...")
-        shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/"..pkg..".lua /MeteorOS/Programs/"..pkg..".lua")
-        print("Package '"..pkg.."' installed.")
-    end
-end
+
 local function table_contains(tbl, x)
     local found = false
     for _, v in pairs(tbl) do
@@ -118,6 +107,31 @@ local function table_contains(tbl, x)
         end
     end
     return found
+end
+local function installPackage(pkg)
+    if pkg == nil or pkg == "" then
+        print("mpm: No package specified")
+        return
+    end
+
+    local pkgs = listGitFiles("Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
+    if not pkgs then
+        print("mpm: Failed to retrieve package list.")
+        return
+    end
+
+    if not table_contains(pkgs, pkg) then
+        print("mpm: Package '"..pkg.."' doesn't exist.")
+        return
+    end
+
+    print("Downloading package '"..pkg.."'...")
+    local success = shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/"..pkg..".lua /MeteorOS/Programs/"..pkg..".lua")
+    if success then
+        print("Package '"..pkg.."' installed.")
+    else
+        print("Failed to download package '"..pkg.."'.")
+    end
 end
 local function loadFile(filename)
     local file = fs.open(filename, "r")
