@@ -492,7 +492,6 @@ print()
 shell.setDir("/MeteorOS")
 local function cli()
     local canvas = modules.canvas()
-    canvas.clear()
     cdir = shell.dir()
     local i = input(cdir..">> ")
     local words = splitBySpaces(i)
@@ -533,6 +532,9 @@ local function cli()
     elseif words[1] == "clear" then
         term.setBackgroundColor(colors.black)
         term.setTextColor(colors.white)
+        if canvas then
+            canvas.clear()
+        end
         term.clear()
         print("[[-------------------------------]]")
         print("[[MeteorOS, Interactive Shell 1.0]]")
