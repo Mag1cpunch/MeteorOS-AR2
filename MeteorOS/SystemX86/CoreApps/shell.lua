@@ -75,6 +75,7 @@ local function installUpdate()
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/CoreApps/shell.lua /MeteorOS/SystemX86/CoreApps/shell.lua")
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua /MeteorOS/Programs/orescanner.lua")
     shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/arterm.lua /MeteorOS/Programs/arterm.lua")
+    shell.run("wget https://energetic.pw/computercraft/ore3d/assets/ore3d.lua /MeteorOS/Programs/ore3d.lua")
     os.reboot()
 end
 local function listGitFiles(repoUrl)
@@ -95,6 +96,18 @@ local function listGitFiles(repoUrl)
         return t
     else
         print("Failed to fetch data from GitHub.")
+    end
+end
+local function installPackage(pkg)
+    local pkgs = listGitFiles("Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
+    if not table.contains(pkgs, pkg) then
+        print("mpm: Package '"..pkg.."' doesn't exist.")
+    elseif pkg == nil or pkg == "" then
+        print("mpm: No package specified")
+    else
+        print("Downloading package '"..pkg.."'...")
+        shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/"..pkg..".lua /MeteorOS/Programs/"..pkg..".lua")
+        print("Package '"..pkg.."' installed.")
     end
 end
 local function table_contains(tbl, x)
@@ -423,7 +436,7 @@ local function desktop()
 end
 -------------------------------
 local function verifyAPIS()
-    print("Verifying APIS...")
+    print("Verifying APIs...")
     if not fs.exists("/MeteorOS/SystemX86/APIS/ar_terminal.lua") then
         shell.run("mkdir /MeteorOS/SystemX86/APIS")
         shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/APIS/ar_terminal.lua")
@@ -472,6 +485,8 @@ local function cli()
             print("[[---------------------------]]")
         else print("Invalid argument")
         end
+    elseif words[1] == "mpm" then
+        installPackage(words[2])
     elseif words[1] == "clear" then
         term.clear()
         print("[[---------------------]]")

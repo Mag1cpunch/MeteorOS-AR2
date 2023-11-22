@@ -13,4 +13,5 @@ shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/M
 shell.run("cd /MeteorOS/Programs")
 shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua")
 shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/arterm.lua")
+shell.run("wget https://energetic.pw/computercraft/ore3d/assets/ore3d.lua /MeteorOS/Programs/ore3d.lua")
 os.reboot()
