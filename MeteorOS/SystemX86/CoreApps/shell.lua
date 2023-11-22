@@ -491,6 +491,8 @@ print("[[-------------------------------]]")
 print()
 shell.setDir("/MeteorOS")
 local function cli()
+    term.setBackgroundColor(colors.purple())
+    term.setTextColor(colors.green())
     local modules = peripheral.find("neuralInterface")
     local canvas = nil
     if modules.canvas() then
@@ -534,8 +536,8 @@ local function cli()
     elseif words[1] == "mpm" and words[2] == "-r" or words[1] == "mpm" and words[2] == "remove" then
         removePackage(words[3])
     elseif words[1] == "clear" then
-        term.setBackgroundColor(colors.black)
-        term.setTextColor(colors.white)
+        term.setBackgroundColor(colors.purple())
+        term.setTextColor(colors.green())
         if canvas then
             canvas.clear()
         elseif canvas == nil then
