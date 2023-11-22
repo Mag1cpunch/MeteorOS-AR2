@@ -517,11 +517,6 @@ local function cli()
         installPackage(words[2])
     elseif words[1] == "mpm -h" or words[1] == "mpm --help" then
         print("-i or install - Install specific package, usage: mpm -i <package> or mpm install <package>")
-    elseif words[1] == "mpm" then
-        print("[[---------------------------]]")
-        print("mpm -i or install - Install specific package, usage: mpm -i <package> or mpm install <package>")
-        print("mpm -r or remove - Remove specified package, usage: mpm -r <package> or mpm remove <package>")
-        print("[[---------------------------]]")
     elseif words[1] == "mpm -r" or words[1] == "mpm remove" then
         removePackage(words[2])
     elseif words[1] == "clear" then
