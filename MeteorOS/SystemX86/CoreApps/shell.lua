@@ -522,12 +522,12 @@ local function cli()
             print("[[---------------------------]]")
         else print("Invalid argument")
         end
-    elseif words[1] == "mpm -i" or words[1] == "mpm install" then
-        installPackage(words[2])
-    elseif words[1] == "mpm -h" or words[1] == "mpm --help" then
+    elseif words[1] == "mpm" and words[2] == "-i" or words[1] == "mpm" and words[2] == "install" then
+        installPackage(words[3])
+    elseif words[1] == "mpm" and words[2] == "-h" or words[1] == "mpm" and words[2] == "--help" then
         print("-i or install - Install specific package, usage: mpm -i <package> or mpm install <package>")
-    elseif words[1] == "mpm -r" or words[1] == "mpm remove" then
-        removePackage(words[2])
+    elseif words[1] == "mpm" and words[2] == "-r" or words[1] == "mpm" and words[2] == "remove" then
+        removePackage(words[3])
     elseif words[1] == "clear" then
         term.setBackgroundColor(colors.black)
         term.setTextColor(colors.white)
