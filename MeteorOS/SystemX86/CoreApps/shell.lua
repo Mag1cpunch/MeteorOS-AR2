@@ -55,41 +55,30 @@ local function splitBySpaces(str)
 end
 local function openProgram(app, category)
     if app ~= nil then
-        if category == nil and fs.exists("/MeteorOS/Programs/"..app) then
-            shell.run("/MeteorOS/Programs/"..app)
-        elseif category ~= nil and fs.exists("/MeteorOS/Programs/"..category) then
-            local fullPath = "/MeteorOS/Programs/"..category.."/"..app
-            if fs.exists(fullPath) then
-                shell.run(fullPath)
-            else
-                print("App '"..app.."' doesn't exist in category '"..category.."'")
-            end
+        local path = category and ("/MeteorOS/Programs/"..category.."/"..app) or ("/MeteorOS/Programs/"..app)
+        if fs.exists(path) then
+            shell.run(path)
         else
-            print("Program '"..app.."' doesn't exist")
+            print("Program '"..app.."' doesn't exist" .. (category and " in category '"..category.."'" or ""))
         end
     else
         print("[System Exception] openProgram(): No program specified.")
     end
 end
 local function installUpdate()
-    if fs.exists("/MeteorOS") then
-        fs.delete("/MeteorOS")
-    end
-    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/startup.lua")
-    shell.run("mkdir /MeteorOS")
-    shell.run("cd /MeteorOS")
-    shell.run("mkdir SystemX86")
-    shell.run("mkdir SystemX86/CoreApps")
-    shell.run("mkdir Programs")
-    shell.run("cd SystemX86/CoreApps")
-    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/CoreApps/shell.lua")
-    shell.run("cd ../../Programs")
-    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua")
-    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/arterm.lua")
+    fs.delete("/MeteorOS")
+    fs.makeDir("/MeteorOS")
+    fs.makeDir("/MeteorOS/SystemX86")
+    fs.makeDir("/MeteorOS/SystemX86/CoreApps")
+    fs.makeDir("/MeteorOS/Programs")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/startup.lua /startup.lua")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/CoreApps/shell.lua /MeteorOS/SystemX86/CoreApps/shell.lua")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/orescanner.lua /MeteorOS/Programs/orescanner.lua")
+    shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs/arterm.lua /MeteorOS/Programs/arterm.lua")
     os.reboot()
 end
 local function listGitFiles(repoUrl)
-    local apiUrl = repoUrl .. "/contents/"
+    local apiUrl = "https://api.github.com/repos/" .. repoUrl .. "/contents/"
     local response = http.get(apiUrl)
 
     if response then
@@ -138,62 +127,56 @@ local function saveFile(filename, content)
     end
 end
 local function editContent(content)
-    local lines = textutils.unserializeJSON('["' .. content:gsub("\n", '","') .. '"]')
-    local yPos = 1
-    local scroll = 1
+    local lines = {}
+    for line in content:gmatch("[^\n]+") do
+        table.insert(lines, line)
+    end
+
     local cursorX, cursorY = 1, 1
+    local scroll = 0
 
     while true do
         term.clear()
         term.setCursorPos(1, 1)
 
-        -- Display lines
-        for i = scroll, scroll + 9 do
-            if lines[i] then
-                term.setCursorPos(1, i - scroll + 1)
-                term.write(lines[i])
+        -- Display lines within the scroll window
+        for i = 1, 19 do
+            if lines[i + scroll] then
+                term.setCursorPos(1, i)
+                term.write(lines[i + scroll])
             end
         end
 
         -- Display cursor
-        term.setCursorPos(cursorX, cursorY - scroll + 1)
+        term.setCursorPos(cursorX, cursorY - scroll)
 
-        local event, param = os.pullEvent()
+        local event, key = os.pullEvent()
         if event == "key" then
-            if param == keys.up and cursorY > 1 then
+            if key == keys.up and cursorY > 1 then
                 cursorY = cursorY - 1
-                if cursorY < scroll then
-                    scroll = scroll - 1
-                end
-            elseif param == keys.down and cursorY < #lines then
+            elseif key == keys.down and cursorY < #lines then
                 cursorY = cursorY + 1
-                if cursorY > scroll + 9 then
-                    scroll = scroll + 1
-                end
-            elseif param == keys.left and cursorX > 1 then
+            elseif key == keys.left and cursorX > 1 then
                 cursorX = cursorX - 1
-            elseif param == keys.right and cursorX < #lines[cursorY] + 1 then
+            elseif key == keys.right and cursorX <= #lines[cursorY] then
                 cursorX = cursorX + 1
-            elseif param == keys.enter then
-                table.insert(lines, cursorY + 1, lines[cursorY]:sub(cursorX))
-                lines[cursorY] = lines[cursorY]:sub(1, cursorX - 1)
+            elseif key == keys.enter then
+                table.insert(lines, cursorY + 1, "")
                 cursorY = cursorY + 1
                 cursorX = 1
-            elseif param == keys.backspace then
-                if cursorX > 1 then
-                    lines[cursorY] = lines[cursorY]:sub(1, cursorX - 2) .. lines[cursorY]:sub(cursorX)
-                    cursorX = cursorX - 1
-                elseif cursorY > 1 then
-                    cursorY = cursorY - 1
-                    cursorX = #lines[cursorY] + 1
-                    lines[cursorY] = lines[cursorY] .. lines[cursorY + 1]
-                    table.remove(lines, cursorY + 1)
-                end
+            elseif key == keys.backspace and cursorX > 1 then
+                lines[cursorY] = lines[cursorY]:sub(1, cursorX - 2) .. lines[cursorY]:sub(cursorX)
+                cursorX = cursorX - 1
+            elseif key == keys.backspace and cursorX == 1 and cursorY > 1 then
+                cursorX = #lines[cursorY - 1] + 1
+                lines[cursorY - 1] = lines[cursorY - 1] .. lines[cursorY]
+                table.remove(lines, cursorY)
+                cursorY = cursorY - 1
             end
         elseif event == "char" then
-            lines[cursorY] = lines[cursorY]:sub(1, cursorX - 1) .. param .. lines[cursorY]:sub(cursorX)
+            lines[cursorY] = lines[cursorY]:sub(1, cursorX - 1) .. key .. lines[cursorY]:sub(cursorX)
             cursorX = cursorX + 1
-        elseif event == "key_up" and param == keys.leftCtrl then
+        elseif event == "key_up" and key == keys.leftCtrl then
             break
         end
     end
@@ -203,9 +186,10 @@ end
 local function textEditor()
     term.clear()
     term.setCursorPos(1, 1)
-
-    print("Simple Text Editor")
-    print("------------------")
+    print("[[----------------]]")
+    print("[[Nova Text Editor]]")
+    print("[[----------------]]")
+    print()
 
     local filename = input("Enter filename to edit: ")
     local content = loadFile(filename) or ""
@@ -222,18 +206,7 @@ local function textEditor()
 
         local option = tonumber(input("Select option (1-3): "))
         if option == 1 then
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            print("File: " .. filename)
-            print("Press Ctrl to exit editing mode.")
-
-            term.setCursorBlink(true)
-
-            -- Read and edit the content
             content = editContent(content)
-
-            term.setCursorBlink(false)
         elseif option == 2 then
             saveFile(filename, content)
         elseif option == 3 then
@@ -243,13 +216,13 @@ local function textEditor()
 
     term.clear()
     term.setCursorPos(1, 1)
-    print("Text editor closed.")
+    print("Nova editor closed.")
 end
 -------------------------------
 --Integrated-apps--------------
 local function appstore()
     local files
-    local files = listGitFiles("https://github.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
+    local files = listGitFiles("Mag1cpunch/MeteorOS-AR2/main/MeteorOS/Programs")
     print("Programs:")
     for _, file in ipairs(files) do
         print(file)
@@ -286,32 +259,166 @@ end
 local function cd(path)
     if fs.exists(path) then
         shell.setDir(path)
+    elseif path == nil then
+        print("No directory specified")
     else
         print("Directory doesn't exist")
     end
 end
 local function ls(path)
-    local t = {}
-    if path == nil or path == "" then
-        local indexes = fs.list(shell.dir())
-        print()
-        for _, index in ipairs(indexes) do
-            print(index.name)
-        end
-        print()
-    elseif path ~= nil then
-        if fs.exists(path) then
-            local indexes = fs.list(path)
-            print()
-            for _, index in ipairs(indexes) do
-                print(index.name)
-            end
-            print()
-        else
-            print("Directory '"..path.."' doesn't exist")
+    local directory = path or shell.dir()
+    if fs.exists(directory) then
+        local listings = fs.list(directory)
+        for _, item in ipairs(listings) do
+            print(item)
         end
     else
-        print("No path specified")
+        print("Directory '"..directory.."' doesn't exist")
+    end
+end
+-- Global Variables
+local screenWidth, screenHeight = term.getSize()
+local appMenuVisible = false
+local currentApp = nil
+
+-- Apps List
+local apps = {
+    { name = "Calculator", action = function() openCalculator() end },
+    -- Add more apps here
+}
+-- Function to draw the desktop
+local function drawDesktop()
+    term.setBackgroundColor(colors.white)
+    term.clear()
+
+    -- Draw the app menu toggle button
+    term.setBackgroundColor(colors.lightGray)
+    term.setTextColor(colors.black)
+    term.setCursorPos(1, screenHeight)
+    term.write(appMenuVisible and "Close" or "Menu")
+end
+-- Function to draw the app menu
+local function drawAppMenu()
+    if appMenuVisible then
+        term.setBackgroundColor(colors.gray)
+        for y = 1, screenHeight - 1 do
+            term.setCursorPos(1, y)
+            term.clearLine()
+        end
+
+        -- List apps
+        for i, app in ipairs(apps) do
+            term.setCursorPos(1, i)
+            term.write(app.name)
+        end
+    end
+end
+-- Function to handle touch events
+local function handleTouch(x, y)
+    if y == screenHeight then
+        -- Toggle app menu
+        appMenuVisible = not appMenuVisible
+    elseif appMenuVisible and y < screenHeight then
+        -- Launch app
+        local appIndex = y
+        if apps[appIndex] then
+            currentApp = apps[appIndex].action
+            appMenuVisible = false
+        end
+    end
+end
+-- Calculator App
+function openCalculator()
+    local input = ""
+    local result = nil
+    local errorMessage = nil
+
+    local function drawCalculator()
+        term.setBackgroundColor(colors.white)
+        term.clear()
+        term.setCursorPos(1, 1)
+        term.write("Calculator")
+        term.setCursorPos(screenWidth - 6, 1)
+        term.write("Close")
+
+        -- Display input and result
+        term.setCursorPos(1, 3)
+        if errorMessage then
+            term.setTextColor(colors.red)
+            term.write(errorMessage)
+        else
+            term.setTextColor(colors.black)
+            term.write("Input: " .. input)
+            term.setCursorPos(1, 4)
+            if result then
+                term.write("Result: " .. tostring(result))
+            end
+        end
+    end
+
+    local function calculate()
+        local func, err = load("return " .. input)
+        if func then
+            local ok, res = pcall(func)
+            if ok then
+                result = res
+                errorMessage = nil
+            else
+                errorMessage = "Error: Invalid calculation"
+            end
+        else
+            errorMessage = "Error: " .. err
+        end
+    end
+
+    local function handleCalculatorTouch(x, y)
+        if y == 1 and x >= screenWidth - 6 then
+            return false -- Close button clicked
+        end
+
+        if y == screenHeight then
+            -- Add your calculator buttons logic here
+            -- Example: if x == 1 then input = input .. "1" end
+            -- You can add more buttons and handle their logic similarly
+        end
+
+        return true
+    end
+
+    while true do
+        drawCalculator()
+
+        local event, button, x, y = os.pullEvent()
+        if event == "mouse_click" or event == "monitor_touch" then
+            if not handleCalculatorTouch(x, y) then
+                break -- Exit the calculator app
+            end
+        end
+
+        if event == "key" then
+            if button == keys.enter then
+                calculate()
+            elseif button == keys.backspace then
+                input = input:sub(1, -2) -- Remove last character
+            end
+        end
+    end
+end
+-- Main desktop function
+local function desktop()
+    while true do
+        drawDesktop()
+        drawAppMenu()
+
+        local event, button, x, y = os.pullEvent()
+        if event == "mouse_click" or event == "monitor_touch" then
+            handleTouch(x, y)
+        end
+
+        if currentApp then
+            currentApp()
+            currentApp = nil
+        end
     end
 end
 -------------------------------
@@ -379,6 +486,8 @@ local function cli()
         installUpdate()
     elseif words[1] == "appstore" then
         appstore()
+    elseif words[1] == "desktop" then
+        desktop()
     elseif words[1] == "nova" then
         textEditor()
     else
