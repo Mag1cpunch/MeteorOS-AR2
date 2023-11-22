@@ -466,7 +466,7 @@ local function verifyAPIS()
     print("Verifying APIs...")
     if not fs.exists("/MeteorOS/SystemX86/APIS/ar_terminal.lua") then
         shell.run("mkdir /MeteorOS/SystemX86/APIS")
-        shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/APIS/ar_terminal.lua")
+        shell.run("wget https://raw.githubusercontent.com/Mag1cpunch/MeteorOS-AR2/main/MeteorOS/SystemX86/APIS/ar_terminal.lua /MeteorOS/SystemX86/APIS/ar_terminal.lua")
     else
         fs.delete("/MeteorOS/SystemX86/APIS/ar_terminal.lua")
         shell.run("mkdir /MeteorOS/SystemX86/APIS")
