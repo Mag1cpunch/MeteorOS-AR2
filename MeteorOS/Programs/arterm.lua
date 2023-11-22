@@ -7,5 +7,11 @@ local function terminal()
     local termsize = term.getSize()
     local canvas = modules.canvas()
     termcanvas = arterm.create(canvas, termsize / 2 + 40, termsize / 2 - 40, 4, 4, 1, true, false)
+    termcanvas.setVisible(true)
 end
-terminal()
+local function handleError(err)
+    print("Error: " .. err)
+    termcanvas.setVisible(false)
+    return
+end
+xpcall(terminal, handleError)
