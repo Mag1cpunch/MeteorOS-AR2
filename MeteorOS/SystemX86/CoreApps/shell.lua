@@ -492,7 +492,10 @@ print()
 shell.setDir("/MeteorOS")
 local function cli()
     local modules = peripheral.find("neuralInterface")
-    local canvas = modules.canvas()
+    local canvas = nil
+    if modules.canvas() then
+        canvas = modules.canvas()
+    end
     cdir = shell.dir()
     local i = input(cdir..">> ")
     local words = splitBySpaces(i)
@@ -535,6 +538,10 @@ local function cli()
         term.setTextColor(colors.white)
         if canvas then
             canvas.clear()
+        elseif canvas == nil then
+            return
+        else
+            return
         end
         term.clear()
         print("[[-------------------------------]]")
