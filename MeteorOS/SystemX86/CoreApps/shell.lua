@@ -133,6 +133,17 @@ local function installPackage(pkg)
         print("Failed to download package '"..pkg.."'.")
     end
 end
+local function removePackage(pkg)
+    if fs.exists("MeteorOS/Programs"..pkg..".lua") then
+        fs.delete("MeteorOS/Programs"..pkg..".lua")
+        print("Package '"..pkg.."' removed.")
+    elseif pkg == nil or pkg == "" then
+        print("mpm: No package specified")
+        return
+    else
+        print("Package '"..pkg.."' doesn't exist.")
+    end
+end
 local function loadFile(filename)
     local file = fs.open(filename, "r")
     if file then
@@ -491,6 +502,7 @@ local function cli()
             print("desktop - Launches experimental ui environment(Needs overlay glasses and neural interface)")
             print("clear - Clear the terminal text")
             print("update - Update the OS")
+            print("mpm - Package management")
             print("[[---------------------------]]")
         elseif words[2] == "programs" then
             print("[[----------Programs---------]]")
@@ -501,8 +513,17 @@ local function cli()
             print("[[---------------------------]]")
         else print("Invalid argument")
         end
-    elseif words[1] == "mpm" then
+    elseif words[1] == "mpm -i" or words[1] == "mpm install" then
         installPackage(words[2])
+    elseif words[1] == "mpm -h" or words[1] == "mpm --help" then
+        print("-i or install - Install specific package, usage: mpm -i <package> or mpm install <package>")
+    elseif words[1] == "mpm" then
+        print("[[---------------------------]]")
+        print("mpm -i or install - Install specific package, usage: mpm -i <package> or mpm install <package>")
+        print("mpm -r or remove - Remove specified package, usage: mpm -r <package> or mpm remove <package>")
+        print("[[---------------------------]]")
+    elseif words[1] == "mpm -r" or words[1] == "mpm remove" then
+        removePackage(words[2])
     elseif words[1] == "clear" then
         term.setBackgroundColor(colors.black)
         term.setTextColor(colors.white)
