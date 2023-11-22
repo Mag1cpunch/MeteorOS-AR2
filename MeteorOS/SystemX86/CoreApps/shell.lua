@@ -488,6 +488,8 @@ local function cli()
     elseif words[1] == "mpm" then
         installPackage(words[2])
     elseif words[1] == "clear" then
+        term.setBackgroundColor(colors.black)
+        term.setTextColor(colors.white)
         term.clear()
         print("[[---------------------]]")
         print("[[Interactive Shell 1.0]]")
