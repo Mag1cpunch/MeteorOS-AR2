@@ -6,7 +6,7 @@ local modules = peripheral.find("neuralInterface")
 local function terminal()
     local termsize = term.getSize()
     local canvas = modules.canvas()
-    termcanvas = arterm.create(canvas, termsize / 2 + 40, termsize / 2 - 40, 4, 4, 1, true, false)
+    termcanvas = arterm.create(canvas, 20, 20, 10, 10, 1, true, false)
     termcanvas.setVisible(true)
 end
 local function handleError(err)
